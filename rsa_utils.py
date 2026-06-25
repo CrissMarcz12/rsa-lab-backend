@@ -69,15 +69,26 @@ def generate_keys(p, q):
         return {"error": "p y q deben ser diferentes"}
 
     n = p * q
+
     phi_n = phi(p, q)
 
     e = find_e(phi_n)
+
     d = find_d(e, phi_n)
 
     return {
+
+        # Números primos
+        "p": p,
+        "q": q,
+
+        # Valores matemáticos
+        "n": n,
+        "phi": phi_n,
         "e": e,
         "d": d,
-        "n": n,
+
+        # Claves
         "public_key": [e, n],
         "private_key": [d, n]
     }
