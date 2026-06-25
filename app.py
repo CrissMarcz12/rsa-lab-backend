@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 CORS(app)
 
+
 # -----------------------------------
 # HOME
 # -----------------------------------
@@ -25,14 +26,18 @@ def home():
 @app.route("/generate", methods=["POST"])
 def generate():
 
-    data = request.json
+    data = request.get_json(force=True)
 
-    p = int(data["p"])
-    q = int(data["q"])
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
 
-    keys = generate_keys(p, q)
+    try:
+        p = int(data["p"])
+        q = int(data["q"])
+    except:
+        return jsonify({"error": "Datos inválidos"}), 400
 
-    return jsonify(keys)
+    return jsonify(generate_keys(p, q))
 
 
 # -----------------------------------
@@ -42,11 +47,17 @@ def generate():
 @app.route("/encrypt", methods=["POST"])
 def encrypt_route():
 
-    data = request.json
+    data = request.get_json(force=True)
 
-    message = data["message"]
-    e = int(data["e"])
-    n = int(data["n"])
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
+
+    try:
+        message = data["message"]
+        e = int(data["e"])
+        n = int(data["n"])
+    except:
+        return jsonify({"error": "Datos inválidos"}), 400
 
     encrypted = encrypt(message, e, n)
 
@@ -62,11 +73,17 @@ def encrypt_route():
 @app.route("/decrypt", methods=["POST"])
 def decrypt_route():
 
-    data = request.json
+    data = request.get_json(force=True)
 
-    encrypted_message = data["encrypted"]
-    d = int(data["d"])
-    n = int(data["n"])
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
+
+    try:
+        encrypted_message = data["encrypted"]
+        d = int(data["d"])
+        n = int(data["n"])
+    except:
+        return jsonify({"error": "Datos inválidos"}), 400
 
     decrypted = decrypt(encrypted_message, d, n)
 
@@ -82,18 +99,26 @@ def decrypt_route():
 @app.route("/factorize", methods=["POST"])
 def factorize_route():
 
-    data = request.json
+    data = request.get_json(force=True)
 
-    n = int(data["n"])
+    if not data:
+        return jsonify({"error": "No se recibieron datos"}), 400
 
-    factors = factorize(n)
+    try:
+        n = int(data["n"])
+    except:
+        return jsonify({"error": "Datos inválidos"}), 400
 
     return jsonify({
-        "factors": factors
+        "factors": factorize(n)
     })
 
 
 # -----------------------------------
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        threaded=True
+    )
